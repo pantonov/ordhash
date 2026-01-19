@@ -26,11 +26,16 @@ fn remove_and_clear_behavior() {
     let mut m = OrdHash::new();
     m.push_back(200, "y");
     m.push_back(100, "x");
+    m.push_back(300, "x");
 
-    assert_eq!(m.remove(&100), Some("x"));
+    assert_eq!(m.mark_unused(&100), Some(&"x"));
     assert_eq!(m.get(&100), None);
     assert_eq!(m.get(&200, ), Some(&"y"));
-    assert_eq!(m.len(), 1);
+    assert_eq!(m.len(), 2);
+    assert_eq!(m.refresh(&100), Some(&"x"));
+    assert_eq!(m.len(), 3);
+    while let Some(_) = m.pop_front() {}
+    assert_eq!(m.is_empty(), true);
 }
 
 #[test]
@@ -40,6 +45,7 @@ fn value_overwrite_and_peek_behaviour() {
     m.push_back(3, "three");
     m.push_back(2, "two");   
     m.push_back(3, "three_updated");
+    assert_eq!(m.len(), 3);
     let values = vec!["one", "two", "three_updated"];
     let mut index = 0;
     while let Some((_k, v)) = m.pop_front() {
